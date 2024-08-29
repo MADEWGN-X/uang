@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <title>Catatan Keuangan</title>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto py-8 px-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Card untuk Total Saldo -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold mb-4">Total Saldo</h2>
+                <p class="text-lg">{{ format_rupiah(total_saldo) }}</p>
+            </div>
+
+            <!-- Form Tambah Pemasukan -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold mb-4">Pemasukan</h2>
+                <form action="{{ url_for('tambah_pemasukan') }}" method="POST">
+                    <div class="mb-4">
+                        <input type="number" name="jumlah" placeholder="Jumlah" required class="w-full p-2 border border-gray-300 rounded">
+                    </div>
+                    <div class="mb-4">
+                        <input type="text" name="keterangan" placeholder="Keterangan" required class="w-full p-2 border border-gray-300 rounded">
+                    </div>
+                    <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">Submit</button>
+                </form>
+            </div>
+
+            <!-- Form Tambah Pengeluaran -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold mb-4">Pengeluaran</h2>
+                <form action="{{ url_for('tambah_pengeluaran') }}" method="POST">
+                    <div class="mb-4">
+                        <input type="number" name="jumlah" placeholder="Jumlah" required class="w-full p-2 border border-gray-300 rounded">
+                    </div>
+                    <div class="mb-4">
+                        <input type="text" name="keterangan" placeholder="Keterangan" required class="w-full p-2 border border-gray-300 rounded">
+                    </div>
+                    <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded">Submit</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tabel Data Per Hari -->
+        <div class="mt-8">
+            <h2 class="text-2xl font-bold mb-4">Data Keuangan Per Hari</h2>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                {% for tanggal, data in data_per_hari.items() %}
+                    <div class="mb-4">
+                        <h3 class="font-bold">{{ tanggal }}</h3>
+                        <ul>
+                            {% for item in data['items'] %}
+                                <li class="flex justify-between">
+                                    <span>{{ item.keterangan }}: {{ format_rupiah(item.jumlah) }}</span>
+                                    <form action="{{ url_for('hapus', key=item.key) }}" method="post" class="inline">
+                                        <button type="submit" class="text-red-500 hover:underline">Hapus</button>
+                                    </form>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        <p class="mt-2"><strong>Pemasukan:</strong> {{ format_rupiah(data['pemasukan']) }}</p>
+                        <p><strong>Pengeluaran:</strong> {{ format_rupiah(data['pengeluaran']) }}</p>
+                        <p><strong>Saldo Harian:</strong> {{ format_rupiah(data['saldo']) }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
